@@ -31,27 +31,28 @@ class App extends Component {
         console.log('componentDidMount');
     }
 
+    onSearchChange = (e) => {
+        console.log('e: ', e);
+        const searchValue = e.target.value.toLowerCase();
+
+        this.setState(() => {
+            return { searchValue };
+        });
+    };
+
     render() {
-        const filteredMonsters = this.state.monsters.filter((monster) => {
+        const { onSearchChange } = this;
+        const { monsters, searchValue } = this.state;
+
+        const filteredMonsters = monsters.filter((monster) => {
             console.log('filteredMonsters: ');
-            return monster.name.toLowerCase().includes(this.state.searchValue);
+            return monster.name.toLowerCase().includes(searchValue);
         });
 
         console.log('render');
         return (
             <div className="App">
-                <input
-                    type="text"
-                    className="search-box"
-                    placeholder="Search Monsters..."
-                    onChange={(e) => {
-                        const searchValue = e.target.value.toLowerCase();
-
-                        this.setState(() => {
-                            return { searchValue };
-                        });
-                    }}
-                />
+                <input type="text" className="search-box" placeholder="Search Monsters..." onChange={onSearchChange} />
                 {filteredMonsters.map((monster) => (
                     <h1 key={monster.id}>{monster.name}</h1>
                 ))}
