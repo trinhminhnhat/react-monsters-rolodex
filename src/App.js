@@ -1,67 +1,45 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import './App.css';
 import CardList from './components/CardList';
 import SearchBox from './components/SearchBox';
 
-class App extends Component {
-    constructor() {
-        super();
+const App = () => {
+    const [searchValue, setSearchValue] = useState('');
+    const [monsters, setMonsters] = useState([]);
+    const [filteredMonsters, setFilteredMonsters] = useState(monsters);
 
-        this.state = {
-            monsters: [],
-            searchValue: '',
-        };
+    const onSearchChange = (e) => {
+        const searchValueString = e.target.value.toLowerCase();
 
-        console.log('constructor');
-    }
-
-    componentDidMount() {
-        fetch('https://jsonplaceholder.typicode.com/users')
-            .then((response) => response.json())
-            .then((users) =>
-                this.setState(
-                    () => {
-                        return { monsters: users };
-                    },
-                    () => {
-                        // console.log('this.state: ', this.state);
-                    },
-                ),
-            );
-
-        console.log('componentDidMount');
-    }
-
-    onSearchChange = (e) => {
-        const searchValue = e.target.value.toLowerCase();
-
-        this.setState(() => {
-            return { searchValue };
-        });
+        setSearchValue(searchValueString);
     };
 
-    render() {
-        const { onSearchChange } = this;
-        const { monsters, searchValue } = this.state;
+    useEffect(() => {
+        fetch('https://jsonplaceholder.typicode.com/users')
+            .then((response) => response.json())
+            .then((users) => setMonsters(users));
+    }, []);
 
-        const filteredMonsters = monsters.filter((monster) => {
+    useEffect(() => {
+        const newFilteredMonsters = monsters.filter((monster) => {
             return monster.name.toLowerCase().includes(searchValue);
         });
 
-        console.log('render');
-        return (
-            <div className="App">
-                <h1 className="app-title">Monsters Rolodex</h1>
-                <SearchBox
-                    onChangeHandler={onSearchChange}
-                    className="monsters-search-box"
-                    placeholder="Search Monsters..."
-                />
-                <CardList monsters={filteredMonsters} />
-            </div>
-        );
-    }
-}
+        setFilteredMonsters(newFilteredMonsters);
+    }, [monsters, searchValue]);
+
+    return (
+        <div className="App">
+            <h1 className="app-title">Monsters Rolodex</h1>
+            <SearchBox
+                onChangeHandler={onSearchChange}
+                className="monsters-search-box"
+                placeholder="Search Monsters..."
+            />
+            <CardList monsters={filteredMonsters} />
+        </div>
+    );
+};
 
 export default App;
